@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Created by RejectH0 - 19 JAN 2024 - 1530 MST
+# Created by RejectH0 - 20 JAN 2024 - 2300 MST
 #
 import subprocess
 import configparser
@@ -27,9 +27,38 @@ DB_NAME = f'{SERVER_HOSTNAME}_speedtest'
 
 def create_database(cursor):
     try:
+        # Create the database if it does not exist
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+        cursor.execute(f"USE {DB_NAME}")
+
+        # Procedure to get the size of the database
+        create_proc_db_size = """
+        CREATE PROCEDURE IF NOT EXISTS GetDatabaseSize()
+        BEGIN
+            SELECT table_schema "Database", SUM(data_length + index_length) / 1024 / 1024 "Size in MB" 
+            FROM information_schema.TABLES 
+            WHERE table_schema = DATABASE()
+            GROUP BY table_schema;
+        END
+        """
+        cursor.execute(create_proc_db_size)
+
+        # Procedure to get stats from speedtest_results
+        create_proc_speedtest_stats = """
+        CREATE PROCEDURE IF NOT EXISTS GetSpeedtestStats()
+        BEGIN
+            SELECT 
+                MIN(timestamp) AS start_date, 
+                MAX(timestamp) AS end_date, 
+                AVG(download / 1024 / 1024) AS avg_download_mbps, 
+                AVG(upload / 1024 / 1024) AS avg_upload_mbps 
+            FROM speedtest_results;
+        END
+        """
+        cursor.execute(create_proc_speedtest_stats)
+
     except Exception as e:
-        print(f"Error creating database: {e}")
+        print(f"Error creating database or stored procedures: {e}")
         sys.exit(1)
 
 def create_table(cursor):
