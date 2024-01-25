@@ -110,6 +110,23 @@ def create_stored_procedures(cursor):
         """
         cursor.execute(create_proc_speedtest_stats)
 
+    # Procedure to archive old entries
+    if not procedure_exists(cursor, 'ArchiveOldEntries'):
+        create_proc_archive_old_entries = """
+        CREATE PROCEDURE ArchiveOldEntries()
+        BEGIN
+            -- Inserts entries older than 48 hours into the archive table
+            INSERT INTO speedtest_results_archive
+            SELECT * FROM speedtest_results
+            WHERE timestamp < NOW() - INTERVAL 48 HOUR;
+
+            -- Deletes those entries from the original table
+            DELETE FROM speedtest_results
+            WHERE timestamp < NOW() - INTERVAL 48 HOUR;
+        END
+        """
+        cursor.execute(create_proc_archive_old_entries)
+
 def run_speedtest():
     try:
         script_dir = os.path.dirname(os.path.realpath(__file__))
