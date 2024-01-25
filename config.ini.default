@@ -1,0 +1,5 @@
+[database]
+host=192.168.131.132
+port=3306
+user=database_user
+password=come.up.with.a.really.good.password.my.dude
