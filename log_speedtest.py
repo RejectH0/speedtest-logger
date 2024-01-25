@@ -239,7 +239,7 @@ def main():
         if data:
             insert_result(cursor, data)
             conn.commit()
-            logging.error("Speedtest data inserted successfully.")
+            logging.info("Speedtest data inserted successfully.")
         else:
             logging.error("No data to insert.")
 
