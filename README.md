@@ -13,6 +13,10 @@
 - `pip3`
 - MariaDB/MySQL database
 
+#### Initialize the Python virtual environment:
+```bash
+python3 -m venv speedtest-logger
+
 #### Dependencies
 - `pymysql`
 - `speedtest-cli`
@@ -23,7 +27,7 @@ pip3 install pymysql speedtest-cli
 ```
 
 #### Configuration
-Create a `config.ini` in the same directory as `log_speedtest.py` with the following content:
+Modify the included config.ini.default and rename it to config.ini. Here's what the file should look like:
 
 ```ini
 [database]
