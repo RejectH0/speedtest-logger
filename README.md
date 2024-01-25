@@ -16,46 +16,47 @@
 #### Initialize the Python virtual environment:
 ```bash
 python3 -m venv speedtest-logger
+```
 
 #### Dependencies
 - `pymysql`
 - `speedtest-cli`
 
 Install them using:
-\```bash
+```bash
 pip3 install pymysql speedtest-cli
-\```
+```
 
 #### Configuration
 Modify the included `config.ini.default` and rename it to `config.ini`. Here's what the file should look like:
 
-\```ini
+```ini
 [database]
 host=192.168.1.110
 port=3306
 user=speedtest
 password=enter.your.password.here.
-\```
+```
 Ensure the `[database]` section and each parameter name remain as is.
 
 #### Initialization
 Initialize and activate the Python environment:
 
-\```bash
+```bash
 python3 -m venv speedtest-logger
 source speedtest-logger/bin/activate
 cd speedtest-logger
 ./log_speedtest.py
-\```
+```
 
 ---
 
 ### Usage
 Run `./log_speedtest.py`. On successful execution, you should see:
 
-\```plaintext
+```plaintext
 Speedtest data inserted successfully.
-\```
+```
 
 ---
 
