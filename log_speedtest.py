@@ -67,7 +67,7 @@ def create_table(cursor):
     )
     """
     create_archive_table_sql = """
-    CREATE TABLE speedtest_results_archive LIKE speedtest_results;
+    CREATE TABLE IF NOT EXISTS speedtest_results_archive LIKE speedtest_results;
     """
     try:
         cursor.execute(create_table_sql)
