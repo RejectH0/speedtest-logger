@@ -32,7 +32,7 @@ def create_database(cursor):
     try:
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
     except Exception as e:
-        print(f"Error creating database: {e}")
+        logging.error(f"Error creating database: {e}")
         sys.exit(1)
 
 def create_speedtest_results_table(cursor):
@@ -71,7 +71,7 @@ def create_speedtest_results_table(cursor):
     try:
         cursor.execute(create_speedtest_results_table_sql)
     except Exception as e:
-        print(f"Error creating speedtest_results table: {e}")
+        logging.error(f"Error creating speedtest_results table: {e}")
         sys.exit(1)
 
 def create_speedtest_results_archive_table(cursor):
@@ -82,7 +82,7 @@ def create_speedtest_results_archive_table(cursor):
     try:
         cursor.execute(create_archive_table_sql)
     except Exception as e:
-        print(f"Error creating archive table: {e}")
+        logging.error(f"Error creating archive table: {e}")
         sys.exit(1)
 
 def create_status_table(cursor):
@@ -97,7 +97,7 @@ def create_status_table(cursor):
     try:
         cursor.execute(create_status_table_sql)
     except Exception as e:
-        print(f"Error creating status table: {e}")
+        logging.error(f"Error creating status table: {e}")
         sys.exit(1)
 
 def insert_enabled_status(cursor):
@@ -111,7 +111,7 @@ def insert_enabled_status(cursor):
             """
             cursor.execute(insert_enabled_status_sql)
         except Exception as e:
-            print(f"Error inserting enabled status: {e}")
+            logging.error(f"Error inserting enabled status: {e}")
             sys.exit(1)
 
 def procedure_exists(cursor, proc_name):
@@ -177,7 +177,7 @@ def run_speedtest():
         output = subprocess.check_output([speedtest_cli_path, '--json'])
         return json.loads(output)
     except Exception as e:
-        print(f"Error running speedtest-cli: {e}")
+        logging.error(f"Error running speedtest-cli: {e}")
         return None
 
 def insert_result(cursor, data):
@@ -209,7 +209,7 @@ def insert_result(cursor, data):
             data['client']['ispulavg'], data['client']['loggedin'], data['client']['country']
         ))
     except Exception as e:
-        print(f"Error inserting data into database: {e}")
+        logging.error(f"Error inserting data into database: {e}")
 
 def main():
     conn = None
@@ -239,12 +239,12 @@ def main():
         if data:
             insert_result(cursor, data)
             conn.commit()
-            print("Speedtest data inserted successfully.")
+            logging.error("Speedtest data inserted successfully.")
         else:
-            print("No data to insert.")
+            logging.error("No data to insert.")
 
     except Exception as e:
-        print(f"Error: {e}")
+        logging.error(f"Error: {e}")
     finally:
         if conn is not None:
             conn.close()
