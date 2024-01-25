@@ -65,8 +65,15 @@ def create_table(cursor):
         client_country VARCHAR(20)
     )
     """
+	create_archive_table_sql = """
+	CREATE TABLE speedtest_results_archive LIKE speedtest_results;
+	)
+	"""
     try:
         cursor.execute(create_table_sql)
+
+        # Create the archive table with the same structure as speedtest_results
+        cursor.execute(create_archive_table_sql)
     except Exception as e:
         print(f"Error creating table: {e}")
         sys.exit(1)
