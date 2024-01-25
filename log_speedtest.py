@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 #
-# Created by RejectH0 - 20 JAN 2024 - 2300 MST
+# version 1.1 - 20240124-2200                    
 #
+# This Python program performs a speedtest and then logs the results into a MariaDB database. 
 import subprocess
 import configparser
 from datetime import datetime
@@ -67,7 +68,6 @@ def create_table(cursor):
     """
     create_archive_table_sql = """
     CREATE TABLE speedtest_results_archive LIKE speedtest_results;
-    )
     """
     try:
         cursor.execute(create_table_sql)
