@@ -14,7 +14,12 @@ import socket
 import logging
 
 # Configuration Variables
-logging.basicConfig(filename='speedtest-logger.log', level=logging.INFO)
+logging.basicConfig(
+    filename='speedtest-logger.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 config = configparser.ConfigParser()
 config.read('config.ini')
 DB_HOST = config['database']['host']
