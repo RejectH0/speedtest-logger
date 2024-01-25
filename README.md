@@ -14,9 +14,9 @@
 - MariaDB/MySQL database
 
 #### Initialize the Python virtual environment:
-\```bash
+```bash
 python3 -m venv speedtest-logger
-\```
+```
 
 #### Dependencies
 - `pymysql`
