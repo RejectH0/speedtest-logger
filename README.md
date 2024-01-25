@@ -13,9 +13,18 @@
 - `pip3`
 - MariaDB/MySQL database
 
+#### First, clone this git repo into /usr/local/speedtest-logger:
+```bash
+cd /usr/local
+git clone https://github.com/RejectH0/speedtest-logger.git
+```
+
 #### Initialize the Python virtual environment:
 ```bash
+cd /usr/local
 python3 -m venv speedtest-logger
+cd speedtest-logger
+source bin/activate
 ```
 
 #### Dependencies
@@ -39,13 +48,11 @@ password=enter.your.password.here.
 ```
 Ensure the `[database]` section and each parameter name remain as is.
 
-#### Initialization
-Initialize and activate the Python environment:
+#### Make the first connection
+Kick off the Python script to make the first collection:
 
 ```bash
-python3 -m venv speedtest-logger
-source speedtest-logger/bin/activate
-cd speedtest-logger
+cd /usr/local/speedtest-logger
 ./log_speedtest.py
 ```
 
