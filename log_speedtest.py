@@ -65,10 +65,10 @@ def create_table(cursor):
         client_country VARCHAR(20)
     )
     """
-	create_archive_table_sql = """
-	CREATE TABLE speedtest_results_archive LIKE speedtest_results;
-	)
-	"""
+    create_archive_table_sql = """
+    CREATE TABLE speedtest_results_archive LIKE speedtest_results;
+    )
+    """
     try:
         cursor.execute(create_table_sql)
 
