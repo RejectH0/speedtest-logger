@@ -1,1 +1,5 @@
 config.ini
+bin
+include
+lib
+lib64
