@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# version 1.1 - 20240124-2200                    
+# version 1.2 - 20240125-0055                   
 #
 # This Python program performs a speedtest and then logs the results into a MariaDB database. 
 import subprocess
@@ -11,8 +11,10 @@ import pymysql
 import sys
 import os
 import socket
+import logging
 
 # Configuration Variables
+logging.basicConfig(filename='speedtest-logger.log', level=logging.ERROR)
 config = configparser.ConfigParser()
 config.read('config.ini')
 DB_HOST = config['database']['host']
@@ -33,8 +35,8 @@ def create_database(cursor):
         print(f"Error creating database: {e}")
         sys.exit(1)
 
-def create_table(cursor):
-    create_table_sql = """
+def create_speedtest_results_table(cursor):
+    create_speedtest_results_table_sql = """
     CREATE TABLE IF NOT EXISTS speedtest_results (
         id INT AUTO_INCREMENT PRIMARY KEY,
         download DOUBLE,
@@ -66,17 +68,51 @@ def create_table(cursor):
         client_country VARCHAR(20)
     )
     """
+    try:
+        cursor.execute(create_speedtest_results_table_sql)
+    except Exception as e:
+        print(f"Error creating speedtest_results table: {e}")
+        sys.exit(1)
+
+def create_speedtest_results_archive_table(cursor):
+    # Create the archive table with the same structure as speedtest_results
     create_archive_table_sql = """
-    CREATE TABLE IF NOT EXISTS speedtest_results_archive LIKE speedtest_results;
+    CREATE TABLE IF NOT EXISTS speedtest_results_archive LIKE speedtest_results
     """
     try:
-        cursor.execute(create_table_sql)
-
-        # Create the archive table with the same structure as speedtest_results
         cursor.execute(create_archive_table_sql)
     except Exception as e:
-        print(f"Error creating table: {e}")
+        print(f"Error creating archive table: {e}")
         sys.exit(1)
+
+def create_status_table(cursor):
+    # Create the status table
+    create_status_table_sql = """
+    CREATE TABLE IF NOT EXISTS status (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        enabled BOOLEAN
+    )
+    """
+    try:
+        cursor.execute(create_status_table_sql)
+    except Exception as e:
+        print(f"Error creating status table: {e}")
+        sys.exit(1)
+
+def insert_enabled_status(cursor):
+    # First we see if the table is empty
+    cursor.execute("SELECT COUNT(*) FROM status")
+    if cursor.fetchone()[0] == 0:
+        try:
+            # Function to insert this host as enabled
+            insert_enabled_status_sql = """
+            INSERT INTO status (enabled) VALUES (TRUE)
+            """
+            cursor.execute(insert_enabled_status_sql)
+        except Exception as e:
+            print(f"Error inserting enabled status: {e}")
+            sys.exit(1)
 
 def procedure_exists(cursor, proc_name):
     cursor.execute("""
@@ -182,10 +218,12 @@ def main():
         conn = pymysql.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASS)
         cursor = conn.cursor()
 
-        # Create database and table
-        create_database(cursor)
+        # Create database and tables
+        create_speedtest_results_table(cursor)
         conn.select_db(DB_NAME)
-        create_table(cursor)
+        create_speedtest_results_archive_table(cursor)
+        create_status_table(cursor)
+        insert_enabled_status(cursor)
 
         # create stored procedures
         create_stored_procedures(cursor)
