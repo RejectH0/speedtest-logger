@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# version 1.2 - 20240125-0055                   
+# version 1.21 - 20240125-0105              
 #
 # This Python program performs a speedtest and then logs the results into a MariaDB database. 
 import subprocess
@@ -218,15 +218,22 @@ def main():
         conn = pymysql.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASS)
         cursor = conn.cursor()
 
-        # Create database and tables
-        create_speedtest_results_table(cursor)
+        # Create database
+        create_database(cursor)
+        # Now select the database
         conn.select_db(DB_NAME)
+
+        # Create tables
+        create_speedtest_results_table(cursor)
         create_speedtest_results_archive_table(cursor)
         create_status_table(cursor)
+
+        # Insert initial enabled status
         insert_enabled_status(cursor)
 
         # create stored procedures
         create_stored_procedures(cursor)
+
         # Run Speedtest and get results
         data = run_speedtest()
         if data:
