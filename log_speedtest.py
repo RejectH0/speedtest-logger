@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# version 1.21 - 20240125-0105              
+# version 1.22 - 20240127-1100              
 #
 # This Python program performs a speedtest and then logs the results into a MariaDB database. 
 import subprocess
@@ -36,6 +36,7 @@ DB_NAME = f'{SERVER_HOSTNAME}_speedtest'
 def create_database(cursor):
     try:
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+        logging.info(f"Database '{DB_NAME}' creation attempted, rows affected: {cursor.rowcount}")
     except Exception as e:
         logging.error(f"Error creating database: {e}")
         sys.exit(1)
@@ -75,6 +76,7 @@ def create_speedtest_results_table(cursor):
     """
     try:
         cursor.execute(create_speedtest_results_table_sql)
+        logging.info(f"Database '{DB_NAME}' creation attempted, rows affected: {cursor.rowcount}")
     except Exception as e:
         logging.error(f"Error creating speedtest_results table: {e}")
         sys.exit(1)
@@ -86,6 +88,7 @@ def create_speedtest_results_archive_table(cursor):
     """
     try:
         cursor.execute(create_archive_table_sql)
+        logging.info(f"Database '{DB_NAME}' creation attempted, rows affected: {cursor.rowcount}")
     except Exception as e:
         logging.error(f"Error creating archive table: {e}")
         sys.exit(1)
@@ -101,6 +104,7 @@ def create_status_table(cursor):
     """
     try:
         cursor.execute(create_status_table_sql)
+        logging.info(f"Table 'status' creation attempted, rows affected: {cursor.rowcount}")
     except Exception as e:
         logging.error(f"Error creating status table: {e}")
         sys.exit(1)
@@ -115,6 +119,7 @@ def insert_enabled_status(cursor):
             INSERT INTO status (enabled) VALUES (TRUE)
             """
             cursor.execute(insert_enabled_status_sql)
+            logging.info(f"Insert 'status' Enabled attempted, rows affected: {cursor.rowcount}")
         except Exception as e:
             logging.error(f"Error inserting enabled status: {e}")
             sys.exit(1)
@@ -127,6 +132,7 @@ def procedure_exists(cursor, proc_name):
         AND ROUTINE_TYPE = 'PROCEDURE'
         AND ROUTINE_NAME = %s
     """, (DB_NAME, proc_name))
+    logging.info(f"procedure_exists - rows affected: {cursor.rowcount}")
     return cursor.fetchone()[0] > 0
 
 def create_stored_procedures(cursor):
@@ -142,6 +148,7 @@ def create_stored_procedures(cursor):
         END
         """
         cursor.execute(create_proc_db_size)
+        logging.info(f"create_stored_procedures - rows affected: {cursor.rowcount}")
 
     # Procedure to get stats from speedtest_results
     if not procedure_exists(cursor, 'GetSpeedtestStats'):
@@ -157,6 +164,7 @@ def create_stored_procedures(cursor):
         END
         """
         cursor.execute(create_proc_speedtest_stats)
+        logging.info(f"create_stored_procedures - rows affected: {cursor.rowcount}")
 
     # Procedure to archive old entries
     if not procedure_exists(cursor, 'ArchiveOldEntries'):
@@ -174,6 +182,7 @@ def create_stored_procedures(cursor):
         END
         """
         cursor.execute(create_proc_archive_old_entries)
+        logging.info(f"create_stored_procedures - rows affected: {cursor.rowcount}")
 
 def run_speedtest():
     try:
@@ -213,6 +222,7 @@ def insert_result(cursor, data):
             data['client']['isprating'], data['client']['rating'], data['client']['ispdlavg'],
             data['client']['ispulavg'], data['client']['loggedin'], data['client']['country']
         ))
+        logging.info(f"insert_result - rows affected: {cursor.rowcount}")
     except Exception as e:
         logging.error(f"Error inserting data into database: {e}")
 
