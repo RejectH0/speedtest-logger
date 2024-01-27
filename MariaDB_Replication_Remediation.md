@@ -1,0 +1,102 @@
+
+# MariaDB Replication Remediation Guide
+
+## Checking Status of Master and Slave Servers
+
+### Master Server (Hostname: arkhiv)
+1. **Check Table Row Count**:
+   ```sql
+   SELECT COUNT(*) FROM {table_name};
+   ```
+
+2. **Check Table Checksum**:
+   ```sql
+   CHECKSUM TABLE {table_name};
+   ```
+
+### Slave Server (Hostname: zerkalo)
+Repeat the same steps as the Master Server to compare the results.
+
+## Resynchronizing the Slave with the Master
+
+1. **Stop Slave**:
+   On the slave server, stop the replication process.
+   ```sql
+   STOP SLAVE;
+   ```
+
+2. **Dump Table on Master**:
+   On the master server, create a dump of the relevant table.
+   ```bash
+   mysqldump -u [username] -p [database_name] [table_name] > table_dump.sql
+   ```
+
+3. **Transfer Dump to Slave**:
+   Use `scp` to transfer the dump file to the slave server.
+   ```bash
+   scp table_dump.sql user@slave_server:/path/to/directory
+   ```
+
+4. **Import Table on Slave**:
+   On the slave server, import the dump file.
+   ```bash
+   mysql -u [username] -p [database_name] < /path/to/directory/table_dump.sql
+   ```
+
+5. **Restart Slave**:
+   Restart the replication process on the slave.
+   ```sql
+   START SLAVE;
+   ```
+
+6. **Check Slave Status**:
+   Verify the replication status.
+   ```sql
+   SHOW SLAVE STATUS\G
+   ```
+
+## Handling Replication Errors
+
+1. **Stop Slave**:
+   ```sql
+   STOP SLAVE;
+   ```
+
+2. **Skip Error**:
+   Set the global SQL slave skip counter to 1 to skip one error.
+   ```sql
+   SET GLOBAL SQL_SLAVE_SKIP_COUNTER = 1;
+   ```
+
+3. **Start Slave**:
+   ```sql
+   START SLAVE;
+   ```
+
+4. **Check Slave Status**:
+   ```sql
+   SHOW SLAVE STATUS\G
+   ```
+
+## Installing and Configuring Percona Toolkit on Debian 12 Bookworm
+
+1. **Install Percona Toolkit**:
+   ```bash
+   sudo apt-get install percona-toolkit
+   ```
+
+2. **Configure Percona Toolkit**:
+   Configure the toolkit as per your database environment.
+
+3. **Check Database Consistency**:
+   Use `pt-table-checksum` for consistency checks.
+   ```bash
+   pt-table-checksum h=master_host,u=user,p=password
+   ```
+
+## Additional Steps and Best Practices
+
+- Ensure regular backups of both master and slave databases.
+- Monitor the replication status regularly to catch any issues early.
+- Document all changes and procedures for future reference.
+- Keep the MariaDB software up-to-date on both master and slave servers.
