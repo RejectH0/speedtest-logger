@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# version 1.22 - 20240127-1100              
+# version 1.23 - 20240127-1115              
 #
 # This Python program performs a speedtest and then logs the results into a MariaDB database. 
 import subprocess
@@ -76,7 +76,7 @@ def create_speedtest_results_table(cursor):
     """
     try:
         cursor.execute(create_speedtest_results_table_sql)
-        logging.info(f"Database '{DB_NAME}' creation attempted, rows affected: {cursor.rowcount}")
+        logging.info(f"create_speedtest_results_table attempted, rows affected: {cursor.rowcount}")
     except Exception as e:
         logging.error(f"Error creating speedtest_results table: {e}")
         sys.exit(1)
@@ -88,7 +88,7 @@ def create_speedtest_results_archive_table(cursor):
     """
     try:
         cursor.execute(create_archive_table_sql)
-        logging.info(f"Database '{DB_NAME}' creation attempted, rows affected: {cursor.rowcount}")
+        logging.info(f"create_speedtest_results_archive_table attempted, rows affected: {cursor.rowcount}")
     except Exception as e:
         logging.error(f"Error creating archive table: {e}")
         sys.exit(1)
